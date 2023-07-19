@@ -33,7 +33,6 @@ jobs:
           exclude-files: lexicon.txt
           exclude-dirs: build,docs
         
-
       - name: Check Last Step Failed
         if: success() || failure() && steps.formatting-check-with-error.outcome == 'failure'
         run: |
@@ -42,6 +41,31 @@ jobs:
             echo -e "\033[32;3mCheck Last Step had outcome '${{ steps.formatting-check-with-error.outcome}}' as intended\033[0m"
           else
             echo -e "\033[32;31mCheck Last Step had unexpected '${{ steps.formatting-check-with-error.outcome}}' exit condition\033[0m"
+            exit 1
+          fi
+
+      - name: Test file permissions action
+        uses: ./formatting
+        with:
+          path: coreMQTT
+          exclude-files: lexicon.txt
+          exclude-dirs: build,docs
+
+      - name: Test file permissions action with non-existent file path
+        id: permissions-check-with-error
+        continue-on-error: true
+        uses: ./formatting
+        with:
+          path: coreMQTT/fakePathThatDoesNotExist
+        
+      - name: Check Last Step Failed
+        if: success() || failure() && steps.formatting-check-with-error.outcome == 'failure'
+        run: |
+          # Check Last Step Failed
+          if [ "${{ steps.permissions-check-with-error.outcome}}" = "failure" ]; then
+            echo -e "\033[32;3mCheck Last Step had outcome '${{ steps.permissions-check-with-error.outcome}}' as intended\033[0m"
+          else
+            echo -e "\033[32;31mCheck Last Step had unexpected '${{ steps.permissions-check-with-error.outcome}}' exit condition\033[0m"
             exit 1
           fi
 
@@ -186,4 +210,3 @@ jobs:
           path: ./FreeRTOS
           exclude-submodules: FreeRTOS-Plus/Test/CMock,FreeRTOS/Test/CMock/CMock,FreeRTOS/Test/litani
           fail-on-incorrect-version: true
-
