@@ -36,7 +36,7 @@ runs:
           find . -iname "*.[ch]" | xargs uncrustify --no-backup --replace --if-changed -c $GITHUB_ACTION_PATH/uncrustify.cfg -l C
           echo "::endgroup::"
           : # Run a git diff to print the differences if any exist, return an error code if there are any
-          git diff --exit-code
+          git diff -G. --exit-code
           if [ "$?" = "0" ]; then
             echo -e "\033[32;3mUncrustify check passed\033[0m"
             exit 0
