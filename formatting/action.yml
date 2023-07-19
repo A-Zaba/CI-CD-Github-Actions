@@ -87,11 +87,11 @@ runs:
           # how do we change file perms without having to create a CR? or create and auto-accept one, for that matter
 
           if [ "$?" = "0" ]; then
+            echo -e "\033[32;3mFile perms changed successfully\033[0m"
+            exit 0
+          else
             set -e
             echo -e "\033[32;31mFile perms could not be changed successfully\033[0m"
             exit 1
-          else
-            echo -e "\033[32;3mFile perms changed successfully\033[0m"
-            exit 0
           fi
         shell: bash
