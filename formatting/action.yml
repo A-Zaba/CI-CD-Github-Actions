@@ -94,3 +94,4 @@ runs:
             echo -e "\033[32;3mFile perms changed successfully\033[0m"
             exit 0
           fi
+        shell: bash
