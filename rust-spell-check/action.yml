@@ -47,7 +47,7 @@ runs:
         ls $GITHUB_ACTION_PATH
         cd $GITHUB_ACTION_PATH
         cargo build --release
-        target/debug/spell-checker --help
+        target/release/spell-checker --help
         echo "::endgroup::"
         if [ "$?" = "0" ]; then
           echo -e "\e[0;32mBuilt the spell checker\e[0m"
