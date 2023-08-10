@@ -15,69 +15,6 @@ env:
   bashEnd:    \033[0m
 
 jobs:
-<<<<<<< HEAD
-  test-format-check:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
-        with:
-          repository: FreeRTOS/coreMQTT
-          ref: main
-          path: coreMQTT
-      - name: Test formatting check action
-        uses: ./formatting
-        with:
-          path: coreMQTT
-          exclude-files: lexicon.txt
-          exclude-dirs: build,docs
-      
-      - name: Test formatting check action with incorrect path
-        id: formatting-check-with-error
-        continue-on-error: true
-        uses: ./formatting
-        with:
-          path: coreMQTT/fakePathThatDoesNotExist
-          exclude-files: lexicon.txt
-          exclude-dirs: build,docs
-        
-      - name: Check Last Step Failed
-        if: success() || failure() && steps.formatting-check-with-error.outcome == 'failure'
-        run: |
-          # Check Last Step Failed
-          if [ "${{ steps.formatting-check-with-error.outcome}}" = "failure" ]; then
-            echo -e "\033[32;3mCheck Last Step had outcome '${{ steps.formatting-check-with-error.outcome}}' as intended\033[0m"
-          else
-            echo -e "\033[32;31mCheck Last Step had unexpected '${{ steps.formatting-check-with-error.outcome}}' exit condition\033[0m"
-            exit 1
-          fi
-
-      - name: Test file permissions action
-        uses: ./formatting
-        with:
-          path: coreMQTT
-          exclude-files: lexicon.txt
-          exclude-dirs: build,docs
-
-      - name: Test file permissions action with non-existent file path
-        id: permissions-check-with-error
-        continue-on-error: true
-        uses: ./formatting
-        with:
-          path: coreMQTT/fakePathThatDoesNotExist
-        
-      - name: Check Last Step Failed
-        if: success() || failure() && steps.formatting-check-with-error.outcome == 'failure'
-        run: |
-          # Check Last Step Failed
-          if [ "${{ steps.permissions-check-with-error.outcome}}" = "failure" ]; then
-            echo -e "\033[32;3mCheck Last Step had outcome '${{ steps.permissions-check-with-error.outcome}}' as intended\033[0m"
-          else
-            echo -e "\033[32;31mCheck Last Step had unexpected '${{ steps.permissions-check-with-error.outcome}}' exit condition\033[0m"
-            exit 1
-          fi
-=======
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
 
   test-complexity-check:
     runs-on: ubuntu-20.04
@@ -101,15 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.11.0'
-=======
 
       - uses: actions/setup-python@v3
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - uses: actions/checkout@v3
         with:
           repository: aws/aws-iot-device-sdk-embedded-C
@@ -128,10 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - uses: actions/checkout@v3
         with:
           repository: skptak/coreMQTT
@@ -147,10 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - uses: actions/checkout@v3
         with:
           repository: skptak/coreMQTT
@@ -161,21 +86,11 @@ jobs:
         uses: ./spellings
         with:
           path: coreMQTT
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
   test-rust-spell-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-      - uses: actions/checkout@v3
-        with:
-          repository: FreeRTOS/coreMQTT
-          ref: main
-          path: coreMQTT
-=======
 
       - uses: actions/checkout@v3
         with:
@@ -183,14 +98,10 @@ jobs:
           ref: main
           path: coreMQTT
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - name: Test spell check action
         uses: ./rust-spell-check
         with:
           path: coreMQTT
-<<<<<<< HEAD
-          lexicon: lexicon.txt
-=======
 
   test-rust-spell-checker-needs-to-build:
     runs-on: ubuntu-latest
@@ -251,7 +162,6 @@ jobs:
           fi
           exit $exitStatus
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
   test-coverage-cop:
     runs-on: ubuntu-latest
     steps:
@@ -314,16 +224,7 @@ jobs:
           coverage-file: ./build/coverage.info
           branch-coverage-min: 70
           line-coverage-min: 100
-
-      - name: Functional | Failure | Coverage Cop Failure Test Case
-        id: failure-coverage-cop-action
-        continue-on-error: true
-        uses: ./coverage-cop
-        with:
-          coverage-file: ./build/coverage.info
-          branch-coverage-min: 100
-          line-coverage-min: 100
-
+          
       - env:
           stepName: Run Coverage Forced Failure
         shell: bash
@@ -341,6 +242,14 @@ jobs:
           lcov --rc lcov_branch_coverage=1 --list build/coverage.info
           echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
 
+      - name: Functional | Failure | Coverage Cop Failure Test Case
+        id: failure-coverage-cop-action
+        continue-on-error: true
+        uses: ./coverage-cop
+        with:
+          coverage-file: ./build/coverage.info
+          branch-coverage-min: 100
+          line-coverage-min: 100
 
       - env:
           stepName: Check Failure Test Case
@@ -363,10 +272,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - name: Test memory statistics action
         uses: ./memory_statistics
         with:
@@ -379,10 +285,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - name: Setup python environment
         uses: actions/setup-python@v3
 
@@ -425,10 +328,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-<<<<<<< HEAD
-=======
 
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
       - name: Setup python environment
         uses: actions/setup-python@v3
 
@@ -445,8 +345,4 @@ jobs:
         with:
           path: ./FreeRTOS
           exclude-submodules: FreeRTOS-Plus/Test/CMock,FreeRTOS/Test/CMock/CMock,FreeRTOS/Test/litani
-<<<<<<< HEAD
           fail-on-incorrect-version: true
-=======
-          fail-on-incorrect-version: true
->>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97
