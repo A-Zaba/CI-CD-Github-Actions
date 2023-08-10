@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Ignore MacOS file system related.
 **/*.DS_Store*
 
@@ -57,3 +58,12 @@ __pycache__/
 
 # Renesas IDE temporary files
 *.nav
+=======
+*.out
+logDir/
+demo_run_logs/
+rust-spell-check/target/
+rust-spell-check/debug/
+# Ignore any helper scripts people are writing while working
+*.sh
+>>>>>>> 11571d313a969fd0f8c294f532cb0a8b2feb1f97

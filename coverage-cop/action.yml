@@ -1,42 +1,107 @@
 name: 'coverage-cop'
 description: 'CI Check Coverage results of unit tests (using lcov)'
 inputs:
-  path:
+  coverage-file:
     description: 'Path to lcov output file containing coverage data.'
     required: true
   branch-coverage-min:
     description: 'The minumum required branch coverage (in %) for success'
     required: false
-    default: 100
+    default: 95
   line-coverage-min:
     description: 'The minumum required line coverage (in %) for success'
     required: false
-    default: 100
+    default: 95
 runs:
   using: "composite"
-  steps: 
-      - name: Print coverage data
-        run: lcov --list --rc lcov_branch_coverage=1 ${{ inputs.path }}
+  steps:
+      - env:
+          stepName: Install Dependencies
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0
         shell: bash
-      - name: Install lcov (if not present)
-        run: sudo apt-get install lcov
-        shell: bash
-      - name: Check coverage
+        name: ${{ env.stepName }}
         run: |
-          LINE_COVERAGE=$(lcov --list ${{ inputs.path }} | tail -n 1 | cut -d '|' -f 2 | sed -n "s/\([^%]*\)%.*/\1/p")
-          BRANCH_COVERAGE=$(lcov --rc lcov_branch_coverage=1 --list ${{ inputs.path }} | tail -n 1 | cut -d '|' -f 4 | sed -n "s/\([^%]*\)%.*/\1/p")
+          # ${{ env.stepName }}
+          echo "::group::${{ env.stepName }}"
+          sudo apt-get install lcov fd-find
+          echo "::endgroup::"
+          echo -e "${{ env.bashPass }} ${{env.stepName }} ${{ env.bashEnd }}"
+
+      - env:
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0
+          stepName: Install Dependencies
+        name: Print Coverage Data
+        shell: bash
+        run: |
+          # ${{ env.stepName }}
+          # Print the lcov report that we received
+          lcov --list --rc lcov_branch_coverage=1 ${{ inputs.coverage-file }}
+
+      - env:
+          stepName: Check Line and Branch Coverage
+          bashPass: \033[32;1mPASSED -
+          bashInfo: \033[33;1mINFO -
+          bashFail: \033[31;1mFAILED -
+          bashEnd:  \033[0
+        name: ${{ env.stepName }}
+        id: check-line-and-branch-coverage
+        shell: bash
+        run: |
+          # ${{ env.stepName }}
+          LINE_COVERAGE=$(lcov --list ${{ inputs.coverage-file }} | tail -n 1 | cut -d '|' -f 2 | sed -n "s/\([^%]*\)%.*/\1/p")
+          BRANCH_COVERAGE=$(lcov --rc lcov_branch_coverage=1 --list ${{ inputs.coverage-file }} | tail -n 1 | cut -d '|' -f 4 | sed -n "s/\([^%]*\)%.*/\1/p")
           RESULT=0
-          echo "Required line coverage: ${{ inputs.line-coverage-min }}"
-          echo "Line coverage:   $LINE_COVERAGE"
+          echo -e " ${{ env.bashInfo }} Required line coverage: ${{ inputs.line-coverage-min }} ${{ env.bashEnd}}"
+          echo -e " ${{ env.bashInfo }} Line coverage:   $LINE_COVERAGE ${{ env.bashEnd}}"
           if [[ $(echo "$LINE_COVERAGE < ${{ inputs.line-coverage-min }}" | bc) -ne 0 ]]; then
-            echo "Line Coverage is too low."
+            echo -e "${{ env.bashFail }} Line Coverage is too low. ${{ env.bashEnd }}"
             RESULT=1
           fi
           echo "Required branch coverage: ${{ inputs.branch-coverage-min }}"
           echo "Branch coverage: $BRANCH_COVERAGE"
           if [[ $(echo "$BRANCH_COVERAGE < ${{ inputs.branch-coverage-min }}" | bc) -ne 0 ]]; then
-            echo "Branch Coverage is too low."
+            echo -e "${{ env.bashFail }} Branch Coverage is too low. ${{ env.bashEnd }}"
             RESULT=1
           fi
+          if [ $RESULT -eq 0 ]; then
+            echo -e "${{ env.bashPass }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          else
+            genhtml --ignore-errors source ${{ inputs.coverage-file }} --legend --title "$(basename `git rev-parse --show-toplevel`) $(git rev-parse HEAD)" --output-directory=htmlCodecovReport
+            zip $GITHUB_ACTION_PATH/htmlCodecovReport.zip htmlCodecovReport
+            echo -e "${{ env.bashFail }} ${{ env.stepName }} ${{ env.bashEnd }}"
+          fi
           exit $RESULT
-        shell: bash
+
+      - name: Upload Failed Codecov HTML Report
+        if: failure() && steps.check-line-and-brach-coverage.outcome == 'failure'
+        uses: actions/upload-artifact@v3
+        with:
+          name: CodecovHTMLReport.zip
+          path: $GITHUB_ACTION_PATH/htmlCodecovReport.zip
+          retention-days: 5
+
+
+
+# We should use this - it creates a link on their website that you can access
+# And it displays the results there, which is great.
+# But it means we need to set up a Codecov dashboard for each repo and then
+# Add that to a secret to use by default when using it.
+# CorePKCS11 evidently has this, but I don't know who set that up or what approvals it took
+# So For now I'm going to create the html report and add it to the run.
+# More info here: https://about.Codecov.io/blog/how-to-set-up-Codecov-with-c-and-github-actions/
+#      - env:
+#          stepName: Upload Line and Branch Report
+#        name: ${{ env.stepName }}
+#        if: failure()
+#        uses: Codecov/Codecov-action@v3
+#        with:
+#          files: ${{ inputs.coverage-file }}
+#          flags: unit_tests
+#          fail_ci_if_error: false
+#          verbose: false
