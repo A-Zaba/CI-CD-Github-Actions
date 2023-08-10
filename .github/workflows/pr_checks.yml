@@ -151,27 +151,27 @@ jobs:
               #org: aws,
               org: skptak,
            },
-           #{
-           #repository: FreeRTOS-Kernel,
-           #exclude-files: .cSpellWords.txt,
-           #run-complexity: false,
-           ##org: aws,
-           #org: skptak,
-           #},
-           #{
-           #  repository: FreeRTOS,
-           #  exclude-files: .cSpellWords.txt,
-           #  run-complexity: false,
-           #  #org: FreeRTOS,
-           #  org: skptak,
-           #},
-           #{
-           #  repository: FreeRTOS-Plus-TCP,
-           #  exclude-files: .cSpellWords.txt,
-           #  run-complexity: false,
-           #  #org: FreeRTOS,
-           #  org: skptak,
-           #},
+           {
+           repository: FreeRTOS-Kernel,
+           exclude-files: .cSpellWords.txt,
+           run-complexity: false,
+           #org: aws,
+           org: skptak,
+           },
+           {
+            repository: FreeRTOS,
+            exclude-files: .cSpellWords.txt,
+            run-complexity: false,
+            #org: FreeRTOS,
+            org: skptak,
+           },
+           {
+            repository: FreeRTOS-Plus-TCP,
+            exclude-files: .cSpellWords.txt,
+            run-complexity: false,
+            #org: FreeRTOS,
+            org: skptak,
+           },
           ]
     steps:
       - uses: actions/checkout@v3
